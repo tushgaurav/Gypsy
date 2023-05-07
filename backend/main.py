@@ -1,18 +1,20 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-
-
-class Search(BaseModel): 
-    Text: str
-    MaxResults: int
+import boto3
 
 
 app = FastAPI()
-    
+client = boto3.client('location', region_name='ap-south-1')
+
 
 @app.get("/api/search/")
 async def search(text: str, maxResults: int = 5):
-    return {
-        "text": text,
-        "maxResults": maxResults
-    }
+    """
+    Autocompletion Support
+    """
+    response = client.search_place_index_for_suggestions(
+        IndexName='GypsyPlaceIndex',
+        Text=text,
+        MaxResults=maxResults
+    )
+
+    return response
